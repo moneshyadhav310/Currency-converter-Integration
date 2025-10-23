@@ -1,0 +1,77 @@
+import requests
+
+
+API_KEY = 'e32f13ea718245a7ad4ac3473fd4b50d' 
+
+
+API_URL = 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion'
+
+def convert_currency(amount, symbol, convert_to):
+    """
+    Converts an amount of one cryptocurrency to another currency.
+    
+    Args:
+        amount (float): The amount of the cryptocurrency to convert.
+        symbol (str): The symbol of the source cryptocurrency (e.g., 'BTC', 'ETH').
+        convert_to (str): The code of the currency to convert to (e.g., 'USD', 'EUR').
+    """
+    print(f"Converting {amount} {symbol} to {convert_to}...")
+
+    
+    headers = {
+        'X-CMC_PRO_API_KEY': API_KEY,
+        'Accept': 'application/json'
+    }
+
+    params = {
+        'amount': amount,
+        'symbol': symbol,
+        'convert': convert_to,
+    }
+
+    try:
+        
+        response = requests.get(API_URL, headers=headers, params=params)
+        
+ 
+        response.raise_for_status()
+
+        
+        data = response.json()
+
+        
+        price = data['data']['quote'][convert_to]['price']
+
+        print("----------------------------------------------------")
+        print("Success!")
+        
+        print(f"{amount} {symbol} = {price:,.2f} {convert_to}")
+        print("----------------------------------------------------\n")
+
+    except requests.exceptions.HTTPError as e:
+      )
+        print(f"Error converting {symbol} to {convert_to}:")
+        print(f"Status Code: {e.response.status_code}")
+        
+        try:
+            error_details = e.response.json()
+            print(f"Details: {error_details.get('status', {}).get('error_message', 'No details provided.')}")
+        except:
+            print("Could not parse error details from response.")
+
+    except requests.exceptions.RequestException as e:
+      
+        print(f"A network error occurred: {e}")
+
+
+if __name__ == "__main__":
+  
+    convert_currency(1, 'BTC', 'USD')
+
+    
+    convert_currency(2.5, 'ETH', 'EUR')
+
+    convert_currency(1000, 'XRP', 'JPY')
+
+    
+    convert_currency(10, 'SOL', 'CAD')
